@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Zapron — AI search for academics",
-    template: "%s — Zapron",
+    default: "Zapron | Better search for academics",
+    template: "%s | Zapron",
   },
   description:
     "Search academic papers across the global research record. Beyond Google Scholar.",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://zapron.vercel.app/",
-    title: "Zapron",
+    title: "Zapron | Better search for academics",
     description:
       "Search academic papers across the global research record. Beyond Google Scholar.",
     siteName: "Zapron",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zapron",
+    title: "Zapron | Better search for academics",
     description:
       "Search academic papers across the global research record. Beyond Google Scholar.",
     images: [

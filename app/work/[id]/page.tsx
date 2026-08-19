@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
 import { BackButton } from "@/components/back-button";
 import { WorkDetail, WorkDetailSkeleton } from "@/components/work-detail";
 import { truncate } from "@/lib/openalex/abstract";
 import { OpenAlexError } from "@/lib/openalex/client";
 import { normalizeWorkId } from "@/lib/openalex/format";
 import { getWorkDetail } from "@/lib/openalex/work";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
 
 interface WorkPageProps {
   params: Promise<{ id: string }>;
@@ -24,18 +24,26 @@ export async function generateMetadata({
       : `${work.display_name} on Zapron.`;
 
     return {
-      title: work.display_name,
+      title: `${work.display_name} | Zapron`,
       description,
       alternates: work.doi ? { canonical: work.doi } : undefined,
       openGraph: {
         type: "article",
-        title: work.display_name,
+        title: `${work.display_name} | Zapron`,
         description,
+        images: [
+          {
+            url: "https://ubrw5iu3hw.ufs.sh/f/TFsxjrtdWsEIhIReWYox89qXNTGMOV5WtPpRAJeCFBiQfcLH",
+            width: 1200,
+            height: 630,
+            alt: "Zapron",
+          },
+        ],
       },
     };
   } catch (error) {
     if (error instanceof OpenAlexError && error.status === 404) {
-      return { title: "Work not found" };
+      return { title: "Work not found | Zapron" };
     }
     throw error;
   }
