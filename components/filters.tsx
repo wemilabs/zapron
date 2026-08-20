@@ -32,17 +32,17 @@ import { CONTINENTS, COUNTRIES, countryName } from "@/lib/geo";
 const CURRENT_YEAR = new Date().getFullYear();
 const PRIMARY_TYPE_OPTIONS = [
   { value: "article", label: "Journal article" },
-  { value: "preprint", label: "Preprint" },
   { value: "review", label: "Review" },
   { value: "book", label: "Book" },
-  { value: "book-chapter", label: "Book chapter" },
+  { value: "dissertation", label: "Dissertation" },
 ];
 
 const MORE_TYPE_OPTIONS = [
-  { value: "dissertation", label: "Dissertation" },
+  { value: "preprint", label: "Preprint" },
+  { value: "book-chapter", label: "Book chapter" },
+  { value: "proceedings-article", label: "Proceedings article" },
   { value: "report", label: "Report" },
   { value: "dataset", label: "Dataset" },
-  { value: "proceedings-article", label: "Proceedings article" },
 ];
 
 const TYPE_OPTIONS = [...PRIMARY_TYPE_OPTIONS, ...MORE_TYPE_OPTIONS];
