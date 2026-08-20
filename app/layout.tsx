@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     siteName: "Zapron",
     images: [
       {
-        url: "https://ubrw5iu3hw.ufs.sh/f/TFsxjrtdWsEIhIReWYox89qXNTGMOV5WtPpRAJeCFBiQfcLH",
+        url: "https://ubrw5iu3hw.ufs.sh/f/TFsxjrtdWsEIAtTrGk8LQvXsUCu2GpW0aw8c4jifV7HDIJ9S",
         width: 1200,
         height: 630,
         alt: "Zapron",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     description:
       "Search, explore, and reason over the global research record. Powered by OpenAlex.",
     images: [
-      "https://ubrw5iu3hw.ufs.sh/f/TFsxjrtdWsEIhIReWYox89qXNTGMOV5WtPpRAJeCFBiQfcLH",
+      "https://ubrw5iu3hw.ufs.sh/f/TFsxjrtdWsEIAtTrGk8LQvXsUCu2GpW0aw8c4jifV7HDIJ9S",
     ],
     creator: "@mthlish",
   },
