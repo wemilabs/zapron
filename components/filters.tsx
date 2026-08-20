@@ -1,10 +1,24 @@
 "use client";
 
+import { CheckIcon, ChevronDownIcon, SearchIcon, XIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -13,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { CONTINENTS, COUNTRIES, countryName } from "@/lib/geo";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const PRIMARY_TYPE_OPTIONS = [
@@ -45,12 +60,16 @@ export function Filters() {
   const yearMin = params.get("year_min");
   const yearMax = params.get("year_max");
   const types = params.getAll("type");
+  const continents = params.getAll("continent");
+  const countries = params.getAll("country");
   const oaOnly = params.get("oa_only") === "true";
   const sort = params.get("sort") ?? "relevance_score";
   const hasActiveFilters = Boolean(
     yearMin ||
       yearMax ||
       types.length > 0 ||
+      continents.length > 0 ||
+      countries.length > 0 ||
       oaOnly ||
       sort !== "relevance_score",
   );
@@ -98,6 +117,32 @@ export function Filters() {
   function clearTypes() {
     const next = new URLSearchParams(params.toString());
     next.delete("type");
+    navigate(next);
+  }
+
+  function updateContinents(continent: string, checked: boolean) {
+    const selected = new Set(continents);
+    if (checked) selected.add(continent);
+    else selected.delete(continent);
+
+    const next = new URLSearchParams(params.toString());
+    next.delete("continent");
+    for (const c of CONTINENTS) {
+      if (selected.has(c.value)) next.append("continent", c.value);
+    }
+    navigate(next);
+  }
+
+  function clearContinents() {
+    const next = new URLSearchParams(params.toString());
+    next.delete("continent");
+    navigate(next);
+  }
+
+  function updateCountries(nextCountries: string[]) {
+    const next = new URLSearchParams(params.toString());
+    next.delete("country");
+    for (const code of nextCountries) next.append("country", code);
     navigate(next);
   }
 
@@ -158,6 +203,33 @@ export function Filters() {
           </div>
         </details>
       </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-foreground">Region</h3>
+          {continents.length > 0 && (
+            <button
+              type="button"
+              onClick={clearContinents}
+              className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <div className="flex flex-col gap-2.5">
+          {CONTINENTS.map((continent) => (
+            <TypeCheckbox
+              key={continent.value}
+              option={continent}
+              checked={continents.includes(continent.value)}
+              onCheckedChange={updateContinents}
+            />
+          ))}
+        </div>
+      </div>
+
+      <CountryFilter selected={countries} onChange={updateCountries} />
 
       <div className="flex flex-col gap-2">
         <h3 className="text-sm font-medium text-foreground">Sort by</h3>
@@ -243,7 +315,7 @@ interface TypeCheckboxProps {
 }
 
 function TypeCheckbox({ option, checked, onCheckedChange }: TypeCheckboxProps) {
-  const id = `publication-type-${option.value}`;
+  const id = `filter-${option.value}`;
 
   return (
     <label
@@ -259,5 +331,111 @@ function TypeCheckbox({ option, checked, onCheckedChange }: TypeCheckboxProps) {
       />
       {option.label}
     </label>
+  );
+}
+
+interface CountryFilterProps {
+  selected: string[];
+  onChange: (next: string[]) => void;
+}
+
+function CountryFilter({ selected, onChange }: CountryFilterProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return COUNTRIES;
+    return COUNTRIES.filter(
+      (c) => c.name.toLowerCase().includes(q) || c.code.includes(q),
+    );
+  }, [search]);
+
+  function toggle(code: string) {
+    const set = new Set(selected);
+    if (set.has(code)) set.delete(code);
+    else set.add(code);
+    onChange([...set]);
+  }
+
+  function remove(code: string) {
+    onChange(selected.filter((c) => c !== code));
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="text-sm font-medium text-foreground">Country</h3>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger
+          render={
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full justify-between font-normal"
+            >
+              <span className="flex items-center gap-2 truncate">
+                <SearchIcon className="size-3.5 text-muted-foreground" />
+                {selected.length > 0
+                  ? `${selected.length} selected`
+                  : "Search countries…"}
+              </span>
+              <ChevronDownIcon className="size-3.5 text-muted-foreground" />
+            </Button>
+          }
+        />
+        <PopoverContent className="w-72 p-0" align="start">
+          <Command shouldFilter={false}>
+            <CommandInput
+              placeholder="Search countries…"
+              value={search}
+              onValueChange={setSearch}
+            />
+            <CommandList>
+              {filtered.length === 0 ? (
+                <CommandEmpty>No countries found.</CommandEmpty>
+              ) : (
+                <CommandGroup>
+                  {filtered.map((country) => {
+                    const isSelected = selected.includes(country.code);
+                    return (
+                      <CommandItem
+                        key={country.code}
+                        value={country.code}
+                        onSelect={() => toggle(country.code)}
+                        data-checked={isSelected}
+                      >
+                        <CheckIcon
+                          className={isSelected ? "opacity-100" : "opacity-0"}
+                        />
+                        <span className="flex-1">{country.name}</span>
+                        <span className="text-xs text-muted-foreground uppercase">
+                          {country.code}
+                        </span>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {selected.map((code) => (
+            <button
+              key={code}
+              type="button"
+              onClick={() => remove(code)}
+              className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-foreground hover:bg-muted/70"
+            >
+              {countryName(code)}
+              <XIcon className="size-3" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

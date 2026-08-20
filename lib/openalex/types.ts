@@ -156,6 +156,8 @@ export interface SearchParams {
   yearMin?: number;
   yearMax?: number;
   types?: string[];
+  continents?: string[];
+  countries?: string[];
   openAccessOnly?: boolean;
   sort?: SortField;
   sortDirection?: SortDirection;
