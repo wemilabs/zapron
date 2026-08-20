@@ -1,6 +1,6 @@
 # Zapron
 
-A next-gen AI search engine for academics. Google Scholar is a dead end — limited to search. Zapron goes beyond: search, explore, and reason over academic literature.
+The research engine for academics. Search, explore, and reason over the global research record — powered by OpenAlex.
 
 > Work in progress. We're defining it as we go.
 
