@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import { CompactSearchBar } from "@/components/compact-search-bar";
 import { Filters } from "@/components/filters";
 import {
@@ -7,6 +5,9 @@ import {
   SearchResultsSkeleton,
 } from "@/components/search-results";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
+import Link from "next/link";
+import { Suspense } from "react";
 
 interface SearchPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -16,9 +17,24 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-8">
       <div className="flex items-center gap-4">
-        <a href="/" className="text-lg font-semibold text-foreground">
-          Zapron
-        </a>
+        <Link href="/" className="shrink-0">
+          <Image
+            src="/logo.png"
+            alt="Zapron"
+            width={32}
+            height={32}
+            className="block dark:hidden"
+            priority
+          />
+          <Image
+            src="/logo-dark.png"
+            alt="Zapron"
+            width={32}
+            height={32}
+            className="hidden dark:block"
+            priority
+          />
+        </Link>
         <div className="flex-1">
           <Suspense fallback={<Skeleton className="h-10 w-full" />}>
             <CompactSearchBar />
