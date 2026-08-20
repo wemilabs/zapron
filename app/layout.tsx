@@ -3,19 +3,19 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Zapron | Better search for academics",
+    default: "Zapron | The research engine for academics",
     template: "%s | Zapron",
   },
   description:
-    "Search academic papers across the global research record. Beyond Google Scholar.",
+    "Search, explore, and reason over the global research record. Powered by OpenAlex.",
   metadataBase: new URL("https://zapron.vercel.app/"),
   keywords: [
     "zapron",
     "research",
     "ai-tools",
     "search-engine",
-    "research",
     "academics",
+    "openalex",
     "lisham_",
   ],
   authors: [
@@ -29,9 +29,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://zapron.vercel.app/",
-    title: "Zapron | Better search for academics",
+    title: "Zapron | The research engine for academics",
     description:
-      "Search academic papers across the global research record. Beyond Google Scholar.",
+      "Search, explore, and reason over the global research record. Powered by OpenAlex.",
     siteName: "Zapron",
     images: [
       {
@@ -44,9 +44,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zapron | Better search for academics",
+    title: "Zapron | The research engine for academics",
     description:
-      "Search academic papers across the global research record. Beyond Google Scholar.",
+      "Search, explore, and reason over the global research record. Powered by OpenAlex.",
     images: [
       "https://ubrw5iu3hw.ufs.sh/f/TFsxjrtdWsEIhIReWYox89qXNTGMOV5WtPpRAJeCFBiQfcLH",
     ],
