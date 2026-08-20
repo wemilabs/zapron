@@ -12,7 +12,8 @@ interface SearchBarProps {
   preserveParams?: URLSearchParams;
 }
 
-const LIVE_SEARCH_DELAY_MS = 250;
+const LIVE_SEARCH_DELAY_MS = 150;
+const LIVE_SEARCH_MIN_LENGTH = 2;
 
 export function SearchBar({
   variant = "hero",
@@ -62,7 +63,8 @@ export function SearchBar({
     const query = event.currentTarget.value.trim();
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    if (!query && variant === "hero") return;
+    if (variant === "hero" && !query) return;
+    if (query && query.length < LIVE_SEARCH_MIN_LENGTH) return;
 
     // Coalesce rapid keystrokes so live search does not spend one external API
     // request per character while keeping the input itself fully responsive.
