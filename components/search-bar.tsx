@@ -43,6 +43,12 @@ export function SearchBar({
       for (const type of preserveParams.getAll("type")) {
         next.append("type", type);
       }
+      for (const continent of preserveParams.getAll("continent")) {
+        next.append("continent", continent);
+      }
+      for (const country of preserveParams.getAll("country")) {
+        next.append("country", country);
+      }
     }
 
     const queryString = next.toString();

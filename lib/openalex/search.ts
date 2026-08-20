@@ -20,6 +20,14 @@ function buildFilter(params: SearchParams): string {
     parts.push("open_access.is_oa:true");
   }
 
+  if (params.continents?.length) {
+    parts.push(`institutions.continent:${params.continents.join("|")}`);
+  }
+
+  if (params.countries?.length) {
+    parts.push(`institutions.country_code:${params.countries.join("|")}`);
+  }
+
   return parts.join(",");
 }
 

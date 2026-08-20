@@ -1,3 +1,4 @@
+import { VALID_CONTINENTS, VALID_COUNTRY_CODES } from "../geo";
 import type { SearchParams, SortField } from "./types";
 
 // Parse Next.js searchParams (a record of string | string[] | undefined) into
@@ -47,6 +48,8 @@ export function parseSearchParams(
     yearMin: num("year_min"),
     yearMax: num("year_max"),
     types: getAll("type").filter((type) => VALID_WORK_TYPES.has(type)),
+    continents: getAll("continent").filter((c) => VALID_CONTINENTS.has(c)),
+    countries: getAll("country").filter((c) => VALID_COUNTRY_CODES.has(c)),
     openAccessOnly: get("oa_only") === "true",
     sort: sort && validSorts.includes(sort) ? sort : "relevance_score",
     sortDirection: get("sort_dir") === "asc" ? "asc" : "desc",
