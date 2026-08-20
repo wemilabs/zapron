@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <style>
+    .bg { fill: #fafafa }
+    .ink { fill: #0a0a0a }
+    .ln { fill: none; stroke: #0a0a0a }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0a0a0a }
+      .ink { fill: #fafafa }
+      .ln { stroke: #fafafa }
+    }
+  </style>
+  <rect class="bg" width="1024" height="1024" rx="220" />
+  <g transform="translate(-8.4 37.2) scale(0.97)">
+    <path class="ink" transform="translate(163.3 -25.7) scale(0.92)" d="M575.2 229 L140.14 851.07 L411.62 851.07 C453.29 851.07 485.27 841.96 507.57 823.73 C529.87 805.5 549.64 768.55 566.89 712.89 L583.01 715.82 L551.76 891.11 L12.7 891.11 L12.7 873.05 L437.5 268.55 L225.59 268.55 C190.43 268.55 164.96 272.38 149.17 280.03 C133.38 287.68 121.34 298.75 113.04 313.23 C104.74 327.72 97.17 354.82 90.33 394.53 L71.78 394.53 L85.45 229 Z" />
+    <path class="ln" d="M468 465 L730 647" stroke-width="28" />
+    <circle class="ln" cx="800" cy="696" r="84" stroke-width="28" />
+    <path class="ln" d="M817 649 A50 50 0 0 1 849 687" stroke-width="14" stroke-linecap="round" />
+  </g>
+</svg>
