@@ -33,13 +33,18 @@ export function getAbstract(work: Work): string | null {
   return reconstructAbstract(work.abstract_inverted_index);
 }
 
-export function getOpenAccessUrl(work: Work): string | null {
+// Accepts WorkDetail (which extends Work) so the arXiv fallback flows through
+// transparently to existing call sites. Plain Work inputs simply skip it.
+export function getOpenAccessUrl(
+  work: Work & { arxivPdfUrl?: string | null },
+): string | null {
   return (
     work.best_oa_location?.pdf_url ??
     work.best_oa_location?.landing_page_url ??
     work.primary_location?.pdf_url ??
     work.primary_location?.landing_page_url ??
     work.open_access?.oa_url ??
+    work.arxivPdfUrl ??
     null
   );
 }

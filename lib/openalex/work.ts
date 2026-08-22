@@ -1,12 +1,16 @@
 import { cacheLife } from "next/cache";
 
+import { arxivIdFromDoi } from "@/lib/arxiv/client";
+import { getArxivPaper } from "@/lib/arxiv/paper";
 import { reconstructAbstract } from "./abstract";
 import { fetchWork, fetchWorkList } from "./client";
-import { normalizeWorkId } from "./format";
+import { getOpenAccessUrl, normalizeWorkId } from "./format";
 import type { SearchResponse, Work } from "./types";
 
 export interface WorkDetail extends Work {
   abstractText: string | null;
+  // arXiv PDF URL surfaced as a fallback when OpenAlex has no OA link.
+  arxivPdfUrl: string | null;
 }
 
 // Works are immutable, so this is a safe cache boundary. Keyed by id (the
@@ -16,9 +20,22 @@ export async function getWorkDetail(id: string): Promise<WorkDetail> {
   cacheLife("days");
 
   const work = await fetchWork(id);
+  const abstractText = reconstructAbstract(work.abstract_inverted_index);
+
+  // Only hit arXiv when OpenAlex has no open-access link and we can bridge on
+  // an arXiv id. OpenAlex rarely populates ids.arxiv_id; the reliable bridge is
+  // the arXiv DOI (10.48550/arXiv.{id}). Avoids an extra request for the
+  // common case where OpenAlex already has an OA URL.
+  const arxivId = arxivIdFromDoi(work.doi) ?? work.ids?.arxiv_id ?? null;
+  const arxivPdfUrl =
+    !getOpenAccessUrl(work) && arxivId
+      ? ((await getArxivPaper(arxivId))?.pdfUrl ?? null)
+      : null;
+
   return {
     ...work,
-    abstractText: reconstructAbstract(work.abstract_inverted_index),
+    abstractText,
+    arxivPdfUrl,
   };
 }
 

@@ -1,10 +1,13 @@
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
+import { FullText, FullTextSkeleton } from "@/components/full-text";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { arxivIdFromDoi } from "@/lib/arxiv/client";
 import { OpenAlexError } from "@/lib/openalex/client";
 import {
   formatAuthors,
@@ -39,6 +42,7 @@ export async function WorkDetail({ params }: WorkDetailProps) {
     const venue = formatVenue(work);
     const oaUrl = getOpenAccessUrl(work);
     const doiUrl = getDoiUrl(work);
+    const arxivId = arxivIdFromDoi(work.doi) ?? work.ids?.arxiv_id ?? null;
     const concepts = (work.concepts ?? [])
       .filter((concept) => (concept.score ?? 0) >= 0.3)
       .slice(0, 8);
@@ -108,22 +112,31 @@ export async function WorkDetail({ params }: WorkDetailProps) {
           </div>
         </header>
 
-        <Tabs defaultValue={0} className="gap-6">
+        <Tabs defaultValue="abstract" className="gap-6">
           <TabsList
             variant="line"
-            className="w-full justify-start gap-5 border-b"
+            className="no-scrollbar w-full justify-start gap-5 overflow-x-auto scroll-fade-e border-b"
           >
-            <TabsTrigger value={0}>Abstract</TabsTrigger>
-            <TabsTrigger value={1}>
+            <TabsTrigger value="abstract" className="flex-none">
+              Abstract
+            </TabsTrigger>
+            {arxivId && (
+              <TabsTrigger value="full-text" className="flex-none">
+                Full text
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="references" className="flex-none">
               References ({work.referenced_works?.length ?? 0})
             </TabsTrigger>
-            <TabsTrigger value={2}>
+            <TabsTrigger value="cited-by" className="flex-none">
               Cited by {(work.cited_by_count ?? 0).toLocaleString()}
             </TabsTrigger>
-            <TabsTrigger value={3}>Details</TabsTrigger>
+            <TabsTrigger value="details" className="flex-none">
+              Details
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value={0} className="max-w-3xl">
+          <TabsContent value="abstract" className="max-w-3xl">
             {work.abstractText ? (
               <p className="text-base leading-8 text-foreground/85">
                 {work.abstractText}
@@ -133,7 +146,15 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             )}
           </TabsContent>
 
-          <TabsContent value={1}>
+          {arxivId && (
+            <TabsContent value="full-text">
+              <Suspense fallback={<FullTextSkeleton />}>
+                <FullText arxivId={arxivId} />
+              </Suspense>
+            </TabsContent>
+          )}
+
+          <TabsContent value="references">
             <WorkList
               works={references.results}
               empty="No references are indexed."
@@ -147,7 +168,7 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             )}
           </TabsContent>
 
-          <TabsContent value={2}>
+          <TabsContent value="cited-by">
             <WorkList
               works={citations.results}
               empty="No citing works are indexed."
@@ -159,7 +180,7 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             )}
           </TabsContent>
 
-          <TabsContent value={3}>
+          <TabsContent value="details">
             <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
               <Detail
                 label="Published"
