@@ -1,3 +1,5 @@
+import { cacheLife } from "next/cache";
+
 import { fetchSearch } from "./client";
 import type { SearchParams, SearchResponse } from "./types";
 
@@ -40,6 +42,9 @@ function buildSort(params: SearchParams): string {
 export async function searchWorks(
   params: SearchParams,
 ): Promise<SearchResponse> {
+  "use cache";
+  cacheLife("minutes");
+
   const query = params.query.trim();
   if (!query) {
     return {
