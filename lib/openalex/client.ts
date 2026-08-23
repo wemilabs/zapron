@@ -1,4 +1,4 @@
-import type { SearchResponse, Work } from "./types";
+import type { AuthorsResponse, SearchResponse, Work } from "./types";
 
 function getApiKey(): string {
   const key = process.env.OPENALEX_API_KEY;
@@ -120,6 +120,27 @@ export async function fetchWork(id: string): Promise<Work> {
   return openalexFetch<Work>({
     path: `/works/${id}`,
     params: { select: DETAIL_SELECT },
+  });
+}
+
+// Fields selected for author resolution — enough to render a profile card.
+const AUTHOR_SELECT = [
+  "id",
+  "display_name",
+  "display_name_alternatives",
+  "orcid",
+  "works_count",
+  "cited_by_count",
+  "summary_stats",
+  "last_known_institutions",
+].join(",");
+
+export async function fetchAuthors(
+  params: Record<string, string | number | boolean | undefined>,
+): Promise<AuthorsResponse> {
+  return openalexFetch<AuthorsResponse>({
+    path: "/authors",
+    params: { ...params, select: AUTHOR_SELECT },
   });
 }
 

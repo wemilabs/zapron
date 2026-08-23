@@ -1,7 +1,13 @@
 import { cacheLife } from "next/cache";
 
+import { resolveAuthor } from "./authors";
 import { fetchSearch } from "./client";
-import type { SearchParams, SearchResponse } from "./types";
+import type {
+  OpenAlexAuthor,
+  SearchParams,
+  SearchResponse,
+  WorkSearchResult,
+} from "./types";
 
 function buildFilter(params: SearchParams): string {
   const parts: string[] = [];
@@ -67,4 +73,56 @@ export async function searchWorks(
   }
 
   return fetchSearch(requestParams);
+}
+
+const EMPTY_RESPONSE: SearchResponse = {
+  meta: { count: 0, per_page: 0, page: null, next_cursor: null },
+  results: [],
+};
+
+async function searchWorksByAuthor(
+  params: SearchParams,
+  author: OpenAlexAuthor,
+): Promise<SearchResponse> {
+  "use cache";
+  cacheLife("minutes");
+
+  const authorId = author.id.split("/").pop() ?? author.id;
+  const filterParts = [`author.id:${authorId}`];
+  const otherFilters = buildFilter(params);
+  if (otherFilters) filterParts.push(otherFilters);
+
+  // Without a text query, relevance_score is meaningless — rank by citations.
+  const sort =
+    params.sort && params.sort !== "relevance_score"
+      ? buildSort(params)
+      : "cited_by_count:desc";
+
+  const requestParams: Record<string, string | number | boolean | undefined> = {
+    filter: filterParts.join(","),
+    sort,
+    per_page: params.perPage ?? 25,
+  };
+
+  if (params.cursor) {
+    requestParams.cursor = params.cursor;
+  } else if (params.page) {
+    requestParams.page = params.page;
+  }
+
+  return fetchSearch(requestParams);
+}
+
+// Entity-aware search: route clear author-name queries to that author's works
+// (Scholar-style), everything else to relevance-ranked text search.
+export async function search(params: SearchParams): Promise<WorkSearchResult> {
+  const query = params.query.trim();
+  if (!query) return { author: null, works: EMPTY_RESPONSE };
+
+  const author = await resolveAuthor(query);
+  if (author) {
+    return { author, works: await searchWorksByAuthor(params, author) };
+  }
+
+  return { author: null, works: await searchWorks(params) };
 }

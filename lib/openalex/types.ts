@@ -145,6 +145,33 @@ export interface SearchResponse {
   results: Work[];
 }
 
+export interface AuthorSummaryStats {
+  h_index: number | null;
+  i10_index: number | null;
+  "2yr_mean_citedness": number | null;
+}
+
+export interface OpenAlexAuthor {
+  id: string;
+  display_name: string;
+  display_name_alternatives: string[] | null;
+  orcid: string | null;
+  works_count: number | null;
+  cited_by_count: number | null;
+  summary_stats: AuthorSummaryStats | null;
+  last_known_institutions: Institution[] | null;
+}
+
+export interface AuthorsResponse {
+  meta: SearchMeta;
+  results: OpenAlexAuthor[];
+}
+
+export interface WorkSearchResult {
+  author: OpenAlexAuthor | null;
+  works: SearchResponse;
+}
+
 export type SortField =
   | "relevance_score"
   | "publication_date"
