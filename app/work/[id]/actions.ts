@@ -1,20 +1,29 @@
 "use server";
 
-import { generateWorkSummary } from "@/lib/ai/summary";
-import type { SummarizeResult, SummaryInput } from "@/lib/ai/types";
+import type { StreamableValue } from "@ai-sdk/rsc";
+
+import { NoContentError, streamWorkSummary } from "@/lib/ai/summary";
+import {
+  NO_CONTENT,
+  type SummarizeResult,
+  type SummaryInput,
+} from "@/lib/ai/types";
 
 export type { SummarizeResult };
 
-// Wraps generateWorkSummary so the client never has to handle thrown errors.
-// A missing API key or a provider failure becomes a typed error result the UI
-// can render with a retry button.
 export async function summarizeWork(
   input: SummaryInput,
-): Promise<SummarizeResult> {
+): Promise<
+  | { ok: true; stream: StreamableValue<string> }
+  | { ok: false; error: string; code?: "NO_CONTENT" }
+> {
   try {
-    const summary = await generateWorkSummary(input);
-    return { ok: true, summary };
+    const stream = await streamWorkSummary(input);
+    return { ok: true, stream };
   } catch (error) {
+    if (error instanceof NoContentError) {
+      return { ok: false, error: NO_CONTENT, code: "NO_CONTENT" };
+    }
     const message =
       error instanceof Error ? error.message : "Failed to generate summary.";
     return { ok: false, error: message };

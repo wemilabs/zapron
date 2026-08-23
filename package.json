@@ -10,6 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@ai-sdk/rsc": "3.0.66",
     "@ai-sdk/xai": "4.0.40",
     "@base-ui/react": "^1.7.0",
     "ai": "7.0.66",
