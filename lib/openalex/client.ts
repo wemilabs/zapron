@@ -117,8 +117,16 @@ export async function fetchSearch(
 }
 
 export async function fetchWork(id: string): Promise<Work> {
+  // Encode the id for the URL path, but keep slashes literal. Regular OpenAlex
+  // IDs (W123) need no encoding; doi:/arxiv: prefixed ids from the Semantic
+  // Scholar bridge contain slashes that OpenAlex expects as literal path
+  // characters (e.g. /works/doi:10.1038/ismej.2011.139). encodeURIComponent
+  // would turn the slash into %2F, which OpenAlex does not decode in the path.
+  const encoded = encodeURIComponent(id)
+    .replace(/%3A/gi, ":")
+    .replace(/%2F/gi, "/");
   return openalexFetch<Work>({
-    path: `/works/${id}`,
+    path: `/works/${encoded}`,
     params: { select: DETAIL_SELECT },
   });
 }

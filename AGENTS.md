@@ -13,6 +13,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Required env
 
 - `OPENALEX_API_KEY` (in `.env.local`) — required to fetch from OpenAlex. Create a free account at <https://openalex.org/settings/api>. The polite pool / `mailto` is deprecated and ignored; a key is mandatory.
+- `SEMANTIC_SCHOLAR_API_KEY` (in `.env.local`) — optional. Without it the Semantic Scholar Graph API allows 1 req/sec; with it ~100 req/sec. Create one at <https://www.semanticscholar.org/product/api#api-key>. Sent as the `x-api-key` header.
+- `XAI_API_KEY` (in `.env.local`) — required for AI summaries. Create one at <https://x.ai/api>. Used by `@ai-sdk/xai` (Grok) to generate on-demand summaries on the work detail page; the key never reaches the client.
 
 ## Commands
 
@@ -27,3 +29,4 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Next.js 16.3 with `cacheComponents: true` and `partialPrefetching: true`. Routes must be prerenderable; push `searchParams`/`params` reads into `<Suspense>`-wrapped children. See `node_modules/next/dist/docs/`.
 - shadcn v4 with `--base base` (Base UI / `@base-ui/react`).
 - OpenAlex data layer is server-only (`lib/openalex/`); the API key never reaches the client.
+- Semantic Scholar data layer is server-only (`lib/semanticscholar/`); the API key never reaches the client. The citation graph and recommendations views bridge from an OpenAlex work to an S2 paper via DOI or arXiv id.

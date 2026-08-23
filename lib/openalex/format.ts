@@ -55,8 +55,14 @@ export function getDoiUrl(work: Work): string | null {
 }
 
 // Extract the OpenAlex ID key (e.g. "W2741809807") from a full URL or accept
-// the key directly.
+// the key directly. Also passes through `doi:` and `arxiv:` prefixed ids so
+// Semantic Scholar neighbors can link back into Zapron via OpenAlex's
+// /works/doi:{doi} and /works/arxiv:{id} endpoints. Next.js passes dynamic
+// segment values URL-encoded, so decode first to recover the literal prefix.
 export function normalizeWorkId(id: string): string {
-  const match = id.match(/W\d+$/i);
-  return match ? match[0] : id;
+  const decoded = decodeURIComponent(id);
+  const lower = decoded.toLowerCase();
+  if (lower.startsWith("doi:") || lower.startsWith("arxiv:")) return decoded;
+  const match = decoded.match(/W\d+$/i);
+  return match ? match[0] : decoded;
 }
