@@ -68,7 +68,9 @@ export function ResultCard({ work }: ResultCardProps) {
           {work.cited_by_count !== null && work.cited_by_count > 0 && (
             <>
               <span aria-hidden>·</span>
-              <span>{work.cited_by_count} citations</span>
+              <span>
+                {work.cited_by_count} citation{work.cited_by_count <= 1 ? "" : "s"}
+              </span>
             </>
           )}
         </div>

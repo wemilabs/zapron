@@ -1,59 +1,79 @@
-import { xai } from "@ai-sdk/xai";
-import { generateText } from "ai";
-import { cacheLife } from "next/cache";
+import { createStreamableValue, type StreamableValue } from "@ai-sdk/rsc";
+import { createXai } from "@ai-sdk/xai";
+import { streamText } from "ai";
 
 import { NO_CONTENT, type SummaryInput } from "@/lib/ai/types";
 import { getArxivFullText } from "@/lib/arxiv/text";
 
 export { NO_CONTENT, type SummaryInput };
 
-// xAI model id for summary generation. Pinned here so a model change is one
-// edit. grok-4.6 is the current flagship; see @ai-sdk/xai for alternatives.
-export const MODEL = "grok-4.6";
+const MODEL = process.env.GROK_MODEL ?? "grok-4.6";
+
+const xai = createXai({
+  baseURL: process.env.XAI_API_BASE_URL,
+  apiKey: process.env.XAI_API_KEY,
+});
 
 const SYSTEM_PROMPT = `You are a research summarizer for Zapron, an academic search engine. Given a paper's title, authors, and full text (or abstract when full text is unavailable), produce a concise structured summary for a researcher scanning results.
 
-Write exactly three sections, each starting with the section name on its own line, followed by 1-3 sentences:
+Write exactly five sections, each starting with the section name in **bold** on its own line, followed by 1-3 sentences:
 
-Key findings
+**Key findings**
 The main claims, results, or contributions of the paper.
 
-Methods
+**Methods**
 How the work was done — the approach, data, or technique.
 
-Significance
+**Significance**
 Why it matters, what gap it fills, or what it enables.
 
+**Limitations**
+The gaps, weaknesses, or boundaries of the work — what the paper does not address, where it stops, or what assumptions it makes.
+
+**Future work**
+The directions, improvements, or research the paper suggests or that naturally follow from it.
+
 Rules:
-- Plain text only. No markdown, no headers beyond the three section names, no bullet points.
+- Wrap each section name in double asterisks for bold, like **Key findings**. Use bold only for section names, nowhere else.
+- No other markdown, no headers beyond the five section names, no bullet points.
 - Be specific and concrete. Reference the actual method or result, not generic filler.
-- Keep the whole summary under 250 words.
+- For Limitations and Future work, ground claims in what the paper actually says. If the paper does not discuss limitations or future work explicitly, infer them from the methods and results but keep it brief.
+- Keep the whole summary under 500 words.
 - If the text is truncated or partial, summarize what is available and do not speculate about missing parts.`;
 
-// Summaries are deterministic given the same input text, so this is a safe cache
-// boundary. Keyed by the SummaryInput fields (the argument becomes part of the
-// cache key automatically). One LLM call per unique work; reused across visits.
-export async function generateWorkSummary(
+export async function streamWorkSummary(
   input: SummaryInput,
-): Promise<string> {
-  "use cache";
-  cacheLife("days");
-
+): Promise<StreamableValue<string>> {
   const body = await resolveContent(input);
-  if (!body) return NO_CONTENT;
+  if (!body) throw new NoContentError();
 
-  const prompt = `Title: ${input.title}
-Authors: ${input.authors}
+  const stream = createStreamableValue<string>();
 
-${body}`;
+  (async () => {
+    try {
+      const { textStream } = streamText({
+        model: xai(MODEL),
+        system: SYSTEM_PROMPT,
+        prompt: `Title: ${input.title}\nAuthors: ${input.authors}\n\n${body}`,
+      });
 
-  const { text } = await generateText({
-    model: xai(MODEL),
-    system: SYSTEM_PROMPT,
-    prompt,
-  });
+      for await (const delta of textStream) {
+        stream.update(delta);
+      }
+      stream.done();
+    } catch (error) {
+      stream.error(error);
+    }
+  })();
 
-  return text.trim();
+  return stream.value;
+}
+
+export class NoContentError extends Error {
+  constructor() {
+    super(NO_CONTENT);
+    this.name = "NoContentError";
+  }
 }
 
 async function resolveContent(input: SummaryInput): Promise<string | null> {

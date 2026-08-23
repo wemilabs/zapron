@@ -158,8 +158,8 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             <TabsTrigger value="graph" className="flex-none">
               Citation graph
             </TabsTrigger>
-            <TabsTrigger value="recommended" className="flex-none">
-              Recommended
+            <TabsTrigger value="recommendations" className="flex-none">
+              Recommendations
             </TabsTrigger>
             <TabsTrigger value="details" className="flex-none">
               Details
@@ -220,7 +220,7 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             </Suspense>
           </TabsContent>
 
-          <TabsContent value="recommended">
+          <TabsContent value="recommendations">
             <Suspense fallback={<RecommendationsSkeleton />}>
               <Recommendations params={params} />
             </Suspense>
