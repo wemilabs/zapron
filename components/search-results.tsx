@@ -4,7 +4,9 @@ import { Pagination } from "@/components/pagination";
 import { ResultCard } from "@/components/result-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseSearchParams } from "@/lib/openalex/params";
-import { searchWorks } from "@/lib/openalex/search";
+import { search } from "@/lib/openalex/search";
+import type { Work } from "@/lib/openalex/types";
+import { AuthorCard } from "./author-card";
 
 const SKELETON_IDS = ["one", "two", "three", "four", "five"];
 
@@ -27,8 +29,8 @@ export async function SearchResults({ searchParams }: SearchResultsProps) {
     );
   }
 
-  const response = await searchWorks(params);
-  const { results, meta } = response;
+  const { author, works } = await search(params);
+  const { results, meta } = works;
 
   if (results.length === 0) {
     return (
@@ -55,11 +57,21 @@ export async function SearchResults({ searchParams }: SearchResultsProps) {
 
   return (
     <div className="flex flex-col gap-4">
+      {author && currentPage === 1 && <AuthorCard author={author} />}
       <p className="text-sm text-muted-foreground">
-        {meta.count.toLocaleString()} results for &ldquo;{params.query}&rdquo;
+        {author ? (
+          <>
+            {meta.count.toLocaleString()} works by {author.display_name}
+          </>
+        ) : (
+          <>
+            {meta.count.toLocaleString()} results for &ldquo;{params.query}
+            &rdquo;
+          </>
+        )}
       </p>
       <div className="flex flex-col gap-4">
-        {results.map((work) => (
+        {results.map((work: Work) => (
           <ResultCard key={work.id} work={work} />
         ))}
       </div>
