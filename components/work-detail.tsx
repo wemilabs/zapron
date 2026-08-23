@@ -3,10 +3,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { AiSummary } from "@/components/ai-summary";
+import {
+  CitationGraph,
+  CitationGraphSkeleton,
+} from "@/components/citation-graph";
 import { FullText, FullTextSkeleton } from "@/components/full-text";
+import {
+  Recommendations,
+  RecommendationsSkeleton,
+} from "@/components/recommendations";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { SummaryInput } from "@/lib/ai/types";
 import { arxivIdFromDoi } from "@/lib/arxiv/client";
 import { OpenAlexError } from "@/lib/openalex/client";
 import {
@@ -34,9 +44,12 @@ export async function WorkDetail({ params }: WorkDetailProps) {
 
   try {
     const work = await getWorkDetail(workId);
+    // The route id may be a doi:/arxiv: alias; filter queries (cites:) need
+    // the canonical W-id, which is always present on the fetched work.
+    const canonicalId = normalizeWorkId(work.id);
     const [references, citations] = await Promise.all([
       getReferencedWorks(work.referenced_works ?? []),
-      getCitingWorks(workId),
+      getCitingWorks(canonicalId),
     ]);
 
     const venue = formatVenue(work);
@@ -46,6 +59,14 @@ export async function WorkDetail({ params }: WorkDetailProps) {
     const concepts = (work.concepts ?? [])
       .filter((concept) => (concept.score ?? 0) >= 0.3)
       .slice(0, 8);
+
+    const summaryInput: SummaryInput = {
+      workId: canonicalId,
+      arxivId,
+      title: work.display_name,
+      authors: formatAuthors(work.authorships),
+      abstractText: work.abstractText,
+    };
 
     return (
       <article className="flex flex-col gap-8">
@@ -117,6 +138,9 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             variant="line"
             className="no-scrollbar w-full justify-start gap-5 overflow-x-auto scroll-fade-e border-b"
           >
+            <TabsTrigger value="summary" className="flex-none">
+              Summary
+            </TabsTrigger>
             <TabsTrigger value="abstract" className="flex-none">
               Abstract
             </TabsTrigger>
@@ -131,10 +155,20 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             <TabsTrigger value="cited-by" className="flex-none">
               Cited by {(work.cited_by_count ?? 0).toLocaleString()}
             </TabsTrigger>
+            <TabsTrigger value="graph" className="flex-none">
+              Citation graph
+            </TabsTrigger>
+            <TabsTrigger value="recommended" className="flex-none">
+              Recommended
+            </TabsTrigger>
             <TabsTrigger value="details" className="flex-none">
               Details
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="summary">
+            <AiSummary input={summaryInput} />
+          </TabsContent>
 
           <TabsContent value="abstract" className="max-w-3xl">
             {work.abstractText ? (
@@ -180,6 +214,18 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             )}
           </TabsContent>
 
+          <TabsContent value="graph">
+            <Suspense fallback={<CitationGraphSkeleton />}>
+              <CitationGraph params={params} compact />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="recommended">
+            <Suspense fallback={<RecommendationsSkeleton />}>
+              <Recommendations params={params} />
+            </Suspense>
+          </TabsContent>
+
           <TabsContent value="details">
             <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
               <Detail
@@ -196,7 +242,7 @@ export async function WorkDetail({ params }: WorkDetailProps) {
                 label="DOI"
                 value={work.doi?.replace("https://doi.org/", "") ?? "—"}
               />
-              <Detail label="OpenAlex ID" value={workId} />
+              <Detail label="OpenAlex ID" value={canonicalId} />
             </div>
             {work.authorships && work.authorships.length > 0 && (
               <section className="mt-8 flex max-w-3xl flex-col gap-3">
