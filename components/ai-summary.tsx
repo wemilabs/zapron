@@ -6,6 +6,14 @@ import { useEffect, useRef, useState } from "react";
 
 import { summarizeWork } from "@/app/work/[id]/actions";
 import { Button } from "@/components/ui/button";
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "@/components/ui/message-scroller";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SummaryInput } from "@/lib/ai/types";
 
@@ -130,8 +138,8 @@ export function AiSummary({ input }: AiSummaryProps) {
   if (status === "empty") {
     return (
       <p className="py-8 text-sm text-muted-foreground">
-        No content is available to summarize. This work has not provided any abstract or
-        arXiv full text.
+        No content is available to summarize. This work has not provided any
+        abstract or arXiv full text.
       </p>
     );
   }
@@ -161,13 +169,26 @@ export function AiSummary({ input }: AiSummaryProps) {
 
   if (summary) {
     return (
-      <div className="max-w-3xl">
-        <p className="whitespace-pre-wrap text-base leading-8 text-foreground/85">
-          {renderBoldSections(summary)}
-          {status === "streaming" && <span className="animate-pulse">▋</span>}
-        </p>
+      <div className="flex max-w-3xl flex-col gap-6">
+        <MessageScrollerProvider autoScroll>
+          <MessageScroller className="max-h-[70vh]">
+            <MessageScrollerViewport>
+              <MessageScrollerContent>
+                <MessageScrollerItem>
+                  <p className="whitespace-pre-wrap text-base leading-8 text-foreground/85">
+                    {renderBoldSections(summary)}
+                    {status === "streaming" && (
+                      <span className="animate-pulse">▋</span>
+                    )}
+                  </p>
+                </MessageScrollerItem>
+              </MessageScrollerContent>
+            </MessageScrollerViewport>
+            <MessageScrollerButton />
+          </MessageScroller>
+        </MessageScrollerProvider>
         {status === "done" && (
-          <div className="mt-6 border-t pt-4">
+          <div className="border-t pt-4">
             <Button
               type="button"
               size="sm"
@@ -185,7 +206,6 @@ export function AiSummary({ input }: AiSummaryProps) {
 
   return <SummarySkeleton />;
 }
-
 
 function renderBoldSections(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
