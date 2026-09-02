@@ -33,6 +33,7 @@ import {
   getReferencedWorks,
   getWorkDetail,
 } from "@/lib/openalex/work";
+import { PaperChat } from "./paper-chat";
 import { ReadAloud } from "./read-aloud";
 
 interface WorkDetailProps {
@@ -67,6 +68,7 @@ export async function WorkDetail({ params }: WorkDetailProps) {
       title: work.display_name,
       authors: formatAuthors(work.authorships),
       abstractText: work.abstractText,
+      pdfUrl: oaUrl,
     };
 
     return (
@@ -288,6 +290,7 @@ export async function WorkDetail({ params }: WorkDetailProps) {
             )}
           </TabsContent>
         </Tabs>
+        <PaperChat input={summaryInput} pdfUrl={oaUrl} />
       </article>
     );
   } catch (error) {
