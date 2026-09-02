@@ -1,6 +1,6 @@
 # Zapron
 
-The research engine for academics. Search, explore, and reason over the global research record — powered by OpenAlex.
+The research engine for academics. Search and reason over the global research record. Powered by OpenAlex.
 
 > Work in progress. We're defining it as we go.
 

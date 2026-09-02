@@ -68,7 +68,7 @@ async function openalexFetch<T>({
   return res.json() as Promise<T>;
 }
 
-// Fields selected for search results — enough to render a result card.
+// Fields selected for search results, enough to render a result card.
 const SEARCH_SELECT = [
   "id",
   "doi",
@@ -131,7 +131,7 @@ export async function fetchWork(id: string): Promise<Work> {
   });
 }
 
-// Fields selected for author resolution — enough to render a profile card.
+// Fields selected for author resolution, enough to render a profile card.
 const AUTHOR_SELECT = [
   "id",
   "display_name",

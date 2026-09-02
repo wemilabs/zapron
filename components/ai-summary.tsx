@@ -54,7 +54,7 @@ function writeCache(workId: string, text: string): void {
     const entry: CachedSummary = { text, cachedAt: Date.now() };
     localStorage.setItem(CACHE_PREFIX + workId, JSON.stringify(entry));
   } catch {
-    // localStorage may be unavailable (private mode, quota) — degrade to
+    // localStorage may be unavailable (private mode, quota), so degrade to
     // re-streaming on every visit. Not worth surfacing to the user.
   }
 }

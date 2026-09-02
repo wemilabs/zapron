@@ -92,7 +92,7 @@ async function searchWorksByAuthor(
   const otherFilters = buildFilter(params);
   if (otherFilters) filterParts.push(otherFilters);
 
-  // Without a text query, relevance_score is meaningless — rank by citations.
+  // Without a text query, relevance_score is meaningless, so rank by citations.
   const sort =
     params.sort && params.sort !== "relevance_score"
       ? buildSort(params)
