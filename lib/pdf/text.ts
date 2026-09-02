@@ -1,7 +1,7 @@
 import { cacheLife } from "next/cache";
 import { extractText, getDocumentProxy } from "unpdf";
 
-// Same cap as arXiv full text — keeps the prompt within model context limits.
+// Same cap as arXiv full text. Keeps the prompt within model context limits.
 export const MAX_PDF_TEXT_CHARS = 80_000;
 
 // OA PDFs are immutable per version, so this is a safe cache boundary.

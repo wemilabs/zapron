@@ -30,6 +30,7 @@ import {
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
 import type { ChatMessage, SummaryInput } from "@/lib/ai/types";
+import { VoiceInput } from "./voice-input";
 
 interface PaperChatProps {
   input: SummaryInput;
@@ -43,11 +44,10 @@ export function PaperChat({ input, pdfUrl }: PaperChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [sendState, setSendState] = useState<SendState>("idle");
-  // Tracks the active stream so a stale one can't write state after a new
-  // question is sent.
+
   const activeQRef = useRef(0);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault();
     const question = draft.trim();
     if (!question || sendState === "sending") return;
@@ -194,6 +194,10 @@ export function PaperChat({ input, pdfUrl }: PaperChatProps) {
               placeholder="Ask a question…"
               disabled={sendState === "sending"}
               autoFocus
+            />
+            <VoiceInput
+              onTranscript={(text) => setDraft(text)}
+              disabled={sendState === "sending"}
             />
             <Button
               type="submit"

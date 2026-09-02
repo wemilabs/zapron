@@ -7,6 +7,7 @@ import { useRef, useState, useTransition } from "react";
 import { parseSearchQuery } from "@/app/search/actions";
 import { Input } from "@/components/ui/input";
 import { parsedQueryToSearchParams } from "@/lib/ai/query-url";
+import { VoiceInput } from "./voice-input";
 
 interface SearchBarProps {
   variant?: "hero" | "compact";
@@ -24,6 +25,7 @@ export function SearchBar({
 }: SearchBarProps) {
   const router = useRouter();
   const initialValueRef = useRef(defaultValue);
+  const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isPending, startTransition] = useTransition();
   const [askAi, setAskAi] = useState(false);
@@ -76,16 +78,11 @@ export function SearchBar({
     const query = event.currentTarget.value.trim();
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    // Ask AI mode only fires on explicit submit
-    // Each parse is an AI call, so live-per-keystroke navigation
-    // would burn credits and feel laggy.
     if (askAi) return;
 
     if (variant === "hero" && !query) return;
     if (query && query.length < LIVE_SEARCH_MIN_LENGTH) return;
 
-    // Coalesce rapid keystrokes so live search does not spend one external API
-    // request per character while keeping the input itself fully responsive.
     timerRef.current = setTimeout(() => navigate(query), LIVE_SEARCH_DELAY_MS);
   }
 
@@ -100,7 +97,7 @@ export function SearchBar({
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (timerRef.current) clearTimeout(timerRef.current);
     const data = new FormData(event.currentTarget);
@@ -116,6 +113,17 @@ export function SearchBar({
   function toggleAskAi() {
     setAskAi((prev) => !prev);
     if (timerRef.current) clearTimeout(timerRef.current);
+  }
+
+  function handleVoiceTranscript(text: string) {
+    if (inputRef.current) {
+      inputRef.current.value = text;
+    }
+    if (askAi) {
+      handleAskAiSubmit(text);
+    } else {
+      navigate(text, true);
+    }
   }
 
   const isHero = variant === "hero";
@@ -146,6 +154,7 @@ export function SearchBar({
           />
         )}
         <Input
+          ref={inputRef}
           name="q"
           defaultValue={initialValueRef.current}
           onChange={handleInput}
@@ -158,28 +167,38 @@ export function SearchBar({
           }
           className={
             isHero
-              ? "h-14 rounded-lg px-12 pr-24 text-base shadow-sm"
-              : "h-10 pl-10 pr-20"
+              ? "h-14 rounded-lg px-12 pr-36 text-base shadow-sm"
+              : "h-10 pl-10 pr-14"
           }
           autoComplete="off"
           autoFocus
         />
-        <button
-          type="button"
-          onClick={toggleAskAi}
-          aria-pressed={askAi}
-          title="Ask AI to parse your query into filters"
-          className={`absolute top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded-md text-xs font-medium transition-colors ${
-            isHero ? "right-3 px-2.5 py-1.5" : "right-2 px-2 py-1"
-          } ${
-            askAi
-              ? "bg-foreground/10 text-foreground"
-              : "text-muted-foreground hover:text-foreground"
+        <div
+          className={`absolute top-1/2 -translate-y-1/2 flex items-center ${
+            isHero ? "right-3" : "right-2"
           }`}
         >
-          <Sparkles className={isHero ? "size-4" : "size-3.5"} />
-          Ask AI
-        </button>
+          <VoiceInput
+            onTranscript={handleVoiceTranscript}
+            size={isHero ? "icon" : "icon-sm"}
+          />
+          <button
+            type="button"
+            onClick={toggleAskAi}
+            aria-pressed={askAi}
+            title="Ask AI to parse your query into filters"
+            className={`inline-flex items-center gap-1 rounded-md text-xs font-medium transition-colors ${
+              isHero ? "px-2.5 py-1.5" : "px-2 py-1"
+            } ${
+              askAi
+                ? "bg-foreground/10 text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Sparkles className={isHero ? "size-4" : "size-3.5"} />
+            Ask AI
+          </button>
+        </div>
       </div>
     </form>
   );
