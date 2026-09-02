@@ -1,31 +1,16 @@
 # Zapron
 
-The research engine for academics. Search and reason over the global research record. Powered by OpenAlex.
+A search engine for the global research record. Type a question, get papers back. Built on OpenAlex, with citation graphs and recommendations from Semantic Scholar and on-demand summaries from Grok.
 
-> Work in progress. We're defining it as we go.
+## What it does
 
-## Tech Stack
+- Search OpenAlex by keyword or natural language.
+- Filter by year range, work type, open access, continent, or country. Sort by relevance, publication date, or citation count.
+- Open a work to read its abstract, references, and citing works.
+- Get a structured AI summary streamed from Grok, with key findings, methods, significance, limitations, and future work. For arXiv papers, the summary reads the full text, not just the abstract.
+- See a citation graph and recommended papers from Semantic Scholar, bridged from OpenAlex by DOI or arXiv id.
+- Read arXiv papers as rendered HTML inside the page.
 
-- [Next.js](https://nextjs.org) (App Router, Turbopack)
-- [React](https://react.dev) 19
-- [Tailwind CSS](https://tailwindcss.com) v4
-- [Biome](https://biomejs.dev) for lint & format
-- [TypeScript](https://www.typescriptlang.org)
-- [pnpm](https://pnpm.io)
+## How natural-language search works
 
-## Getting Started
-
-```bash
-pnpm install
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Scripts
-
-- `pnpm dev` — start the dev server
-- `pnpm build` — production build
-- `pnpm start` — run the production build
-- `pnpm lint` — run Biome checks
-- `pnpm format` — format with Biome
+When you submit a query, Grok parses it into structured OpenAlex filter params: search term, year range, work types, open access, continents, countries, and sort. The parsed result is cached for a day per query, so the same phrasing always maps to the same filters. If parsing fails, the raw query string is used as a plain search term, so you always land on a working search.
