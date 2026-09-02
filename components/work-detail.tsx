@@ -33,6 +33,7 @@ import {
   getReferencedWorks,
   getWorkDetail,
 } from "@/lib/openalex/work";
+import { ReadAloud } from "./read-aloud";
 
 interface WorkDetailProps {
   params: Promise<{ id: string }>;
@@ -172,9 +173,12 @@ export async function WorkDetail({ params }: WorkDetailProps) {
 
           <TabsContent value="abstract" className="max-w-3xl">
             {work.abstractText ? (
-              <p className="text-base leading-8 text-foreground/85">
-                {work.abstractText}
-              </p>
+              <div className="flex flex-col gap-4">
+                <ReadAloud text={work.abstractText} />
+                <p className="text-base leading-8 text-foreground/85">
+                  {work.abstractText}
+                </p>
+              </div>
             ) : (
               <EmptyState>No abstract is available for this work.</EmptyState>
             )}
