@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | Zapron",
   },
   description:
-    "Search, explore, and reason over the global research record. Powered by OpenAlex.",
+    "Search and reason over the global research record. Powered by OpenAlex.",
   metadataBase: new URL("https://zapron.vercel.app/"),
   keywords: [
     "zapron",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     url: "https://zapron.vercel.app/",
     title: "Zapron | The research engine for academics",
     description:
-      "Search, explore, and reason over the global research record. Powered by OpenAlex.",
+      "Search and reason over the global research record. Powered by OpenAlex.",
     siteName: "Zapron",
     images: [
       {
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Zapron | The research engine for academics",
     description:
-      "Search, explore, and reason over the global research record. Powered by OpenAlex.",
+      "Search and reason over the global research record. Powered by OpenAlex.",
     images: ["/og.png"],
     creator: "@mthlish",
   },

@@ -27,7 +27,7 @@ export interface Country {
 }
 
 // ISO 3166-1 alpha-2 codes grouped by OpenAlex continent.
-// Antarctica is omitted — negligible research output and no institutions
+// Antarctica is omitted: negligible research output and no institutions
 // of consequence in the OpenAlex dataset.
 export const COUNTRIES: readonly Country[] = [
   // Africa

@@ -22,16 +22,16 @@ Write exactly five sections, each starting with the section name in **bold** on 
 The main claims, results, or contributions of the paper.
 
 **Methods**
-How the work was done — the approach, data, or technique.
+The approach, data, or technique behind the work.
 
 **Significance**
 Why it matters, what gap it fills, or what it enables.
 
 **Limitations**
-The gaps, weaknesses, or boundaries of the work — what the paper does not address, where it stops, or what assumptions it makes.
+The gaps, weaknesses, or boundaries of the work: what the paper does not address, where it stops, or what it assumes.
 
 **Future work**
-The directions, improvements, or research the paper suggests or that naturally follow from it.
+The directions, improvements, or research the paper suggests or that follow from it.
 
 Rules:
 - Wrap each section name in double asterisks for bold, like **Key findings**. Use bold only for section names, nowhere else.

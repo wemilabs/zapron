@@ -11,7 +11,7 @@ export default function Home() {
             Zapron
           </h1>
           <p className="max-w-md text-lg text-muted-foreground">
-            Search, explore, and reason over the global research record.
+            Search and reason over the global research record.
           </p>
         </div>
         <SearchBar variant="hero" />
