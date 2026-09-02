@@ -1,7 +1,8 @@
 // Pure types and constants shared between the server-only summary generator
 // and the client UI. This file must not import anything server-only (no
 // "next/cache", no "ai", no "use cache") so it is safe to bundle into the
-// client.
+// client. Type-only imports from @ai-sdk/rsc are safe — they erase at build.
+import type { StreamableValue } from "@ai-sdk/rsc";
 
 export interface SummaryInput {
   workId: string;
@@ -9,6 +10,7 @@ export interface SummaryInput {
   title: string;
   authors: string;
   abstractText: string | null;
+  pdfUrl?: string | null;
 }
 
 // Sentinel returned when there's nothing to summarize. The action and UI
@@ -38,3 +40,14 @@ export interface ParsedSearchQuery {
 export type ParseSearchResult =
   | { ok: true; query: ParsedSearchQuery }
   | { ok: false; error: string };
+
+// Q&A chat on a paper. The input reuses SummaryInput (same paper context);
+// history is the prior turns sent to the model for multi-turn conversation.
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export type AskResult =
+  | { ok: true; stream: StreamableValue<string> }
+  | { ok: false; error: string; code?: "NO_CONTENT" };

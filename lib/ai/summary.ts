@@ -2,8 +2,8 @@ import { createStreamableValue, type StreamableValue } from "@ai-sdk/rsc";
 import { createXai } from "@ai-sdk/xai";
 import { streamText } from "ai";
 
+import { resolveContent } from "@/lib/ai/content";
 import { NO_CONTENT, type SummaryInput } from "@/lib/ai/types";
-import { getArxivFullText } from "@/lib/arxiv/text";
 
 export { NO_CONTENT, type SummaryInput };
 
@@ -74,13 +74,4 @@ export class NoContentError extends Error {
     super(NO_CONTENT);
     this.name = "NoContentError";
   }
-}
-
-async function resolveContent(input: SummaryInput): Promise<string | null> {
-  if (input.arxivId) {
-    const fullText = await getArxivFullText(input.arxivId);
-    if (fullText) return `Full text:\n\n${fullText}`;
-  }
-  if (input.abstractText) return `Abstract:\n\n${input.abstractText}`;
-  return null;
 }
