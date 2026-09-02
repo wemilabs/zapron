@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/message-scroller";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SummaryInput } from "@/lib/ai/types";
+import { ReadAloud } from "./read-aloud";
 
 interface AiSummaryProps {
   input: SummaryInput;
@@ -188,7 +189,8 @@ export function AiSummary({ input }: AiSummaryProps) {
           </MessageScroller>
         </MessageScrollerProvider>
         {status === "done" && (
-          <div className="border-t pt-4">
+          <div className="flex flex-wrap items-center gap-2 border-t pt-4">
+            <ReadAloud text={summary} />
             <Button
               type="button"
               size="sm"

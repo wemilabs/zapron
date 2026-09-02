@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
 import { BackButton } from "@/components/back-button";
 import { WorkDetail, WorkDetailSkeleton } from "@/components/work-detail";
 import { truncate } from "@/lib/openalex/abstract";
 import { OpenAlexError } from "@/lib/openalex/client";
 import { normalizeWorkId } from "@/lib/openalex/format";
 import { getWorkDetail } from "@/lib/openalex/work";
+import type { Metadata } from "next";
+import { Suspense } from "react";
 
 interface WorkPageProps {
   params: Promise<{ id: string }>;
@@ -23,12 +23,12 @@ export async function generateMetadata({
       : `${work.display_name} on Zapron.`;
 
     return {
-      title: `${work.display_name} | Zapron`,
+      title: `${work.display_name}`,
       description,
       alternates: work.doi ? { canonical: work.doi } : undefined,
       openGraph: {
         type: "article",
-        title: `${work.display_name} | Zapron`,
+        title: `${work.display_name}`,
         description,
         images: [
           {
