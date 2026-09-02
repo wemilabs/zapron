@@ -13,7 +13,7 @@ const xai = createXai({
   apiKey: process.env.XAI_API_KEY,
 });
 
-const SYSTEM_PROMPT = `You are a research assistant for Zapron, an academic search engine. The user is reading a paper and asking questions about it. Answer using only the provided paper text. If the answer is not in the paper, say so plainly — do not fabricate or speculate.
+const SYSTEM_PROMPT = `You are a research assistant for Zapron, an academic search engine. The user is reading a paper and asking questions about it. Answer using only the provided paper text. If the answer is not in the paper, say so plainly. Do not fabricate or speculate.
 
 Rules:
 - Be concise and direct. Answer the specific question asked.
@@ -41,7 +41,7 @@ export async function streamChatReply(
 
       const { textStream } = streamText({
         model: xai(MODEL),
-        system: `${SYSTEM_PROMPT}\n\nPaper context — Title: ${input.title}\nAuthors: ${input.authors}\n\n${body}`,
+        system: `${SYSTEM_PROMPT}\n\nPaper context. Title: ${input.title}\nAuthors: ${input.authors}\n\n${body}`,
         messages,
       });
 

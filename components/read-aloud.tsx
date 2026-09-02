@@ -20,7 +20,7 @@ function cleanText(text: string): string {
 export function ReadAloud({ text }: ReadAloudProps) {
   const [status, setStatus] = useState<Status>("idle");
 
-  // Audio element and its blob URL live on refs — not reactive, only the
+  // Audio element and its blob URL live on refs. Not reactive, only the
   // playback status drives the UI.
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const urlRef = useRef<string | null>(null);

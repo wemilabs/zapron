@@ -1,7 +1,7 @@
 // Pure types and constants shared between the server-only summary generator
 // and the client UI. This file must not import anything server-only (no
 // "next/cache", no "ai", no "use cache") so it is safe to bundle into the
-// client. Type-only imports from @ai-sdk/rsc are safe — they erase at build.
+// client. Type-only imports from @ai-sdk/rsc are safe. They erase at build.
 import type { StreamableValue } from "@ai-sdk/rsc";
 
 export interface SummaryInput {
